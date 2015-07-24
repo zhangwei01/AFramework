@@ -1,0 +1,302 @@
+﻿
+新项目推荐AndroidStudio
+修改需大家共同维护
+
+Src
+------------------------------------------------------------------------------------------------------------------
+com.autonavi.navigation.framework
+	|
+	+---->base	基类
+	|		|
+	|		+---->activity 
+	|		|
+	|		+---->application
+	|		|
+	|		+---->fragment
+	|		|
+	|		+---->receiver
+	|		|		|
+	|		|		+---->BootReceiver.java 自启动广播
+	|		|
+	|		+---->utils
+	|				|
+	|				+---->详见UtilsDoc.txt
+	|		
+	+---->demo
+	|		|
+	|		+---->DemoActivity 验证相关功能
+	|		|
+	|		+---->NfcActivity NfcDemo
+	|		|
+	|		+---->ThemeActivity 换肤demo
+	|		|
+	|		+---->SkinManagerActivity 换肤功能demo中的皮肤管理
+	|	
+	+---->image
+	|		|
+	|		+---->使用facebook提供的fresco，建议在AndroidStudio中引入
+	|			github：https://github.com/facebook/fresco
+	|			使用手册：http://fresco-cn.org/docs/index.html
+	|	
+	+---->nfc 已实现基本传输，可做深入拓展
+	|		|
+	|		+---->bean	
+	|		|		|
+	|		|		+---->NfcInfo.java 存储TAG或P2P信息。
+	|		|
+	|		+---->utils
+	|		|		|
+	|		|		+---->NfcUtils.java 类型解释与转义工具类
+	|		|
+	|		+---->Nfc.java	
+	|
+	+---->plugin
+	|		| 
+	|		+---->插件部分代码建议使用独立lib包引入 ：https://github.com/singwhatiwanna/dynamic-load-apk
+	|	
+	+---->theme	换肤相关
+			|
+			+---->activity
+			|		|
+			|		+---->SkinActivity	换肤Activity基类
+			|
+			+---->configuration	
+			|		|
+			|		+---->SkinConfiguration 参数的配置和定义
+			|
+			+---->context
+			|		|   
+			|		+---->SkinContextWrapper 自定义的Context类
+			|
+			+---->listener
+			|		|
+			|		+---->OnSkinListener 换肤监听类
+			|
+			+---->manager		
+			|		|
+			|		+---->SkinManager 换肤管理类，用于管理皮肤和回调界面开始换肤等
+			|
+			+---->model	
+			|		|
+			|		+---->Skin	皮肤包对象，包含皮肤包的一些数据	
+			|
+			+---->docs 包含相关文档
+
+	设计时尽量降低模块间耦合，考虑独立分离出来简单方便
+	
+	类似AnApi设计模式，框架提供给上层相应共用接口
+
+Libs
+------------------------------------------------------------------------------------------------------------------
+
+	##android-async-http
+		网络请求模块，可替代GDHttpHandler
+		github：https://github.com/loopj/android-async-http
+		使用手册：http://loopj.com/android-async-http/
+		API：http://loopj.com/android-async-http/doc/
+		
+	##EventBus
+		简洁的写法代替广播，监听器，Hanlder。
+		github：https://github.com/greenrobot/EventBus
+		HOW TO：https://github.com/greenrobot/EventBus/blob/master/HOWTO.md
+
+	##guavalib
+		nfc依赖库，Guava工程包含了若干被Google的 Java项目广泛依赖 的核心库
+		github：https://github.com/google/guava
+	
+Res
+------------------------------------------------------------------------------------------------------------------
+
+anim 动画
+	按命名理解动画
+	
+drawable 统一命名规则，选出一人作为主导
+
+------------------------------------------------------------------------------------------------------------------
+
+#android-async-http
+
+	1.gradle
+
+		dependencies {
+		  compile 'com.loopj.android:android-async-http:1.4.5'
+		}
+
+	2.sample
+
+		AsyncHttpClient client = new AsyncHttpClient();
+		client.get("http://www.google.com", new AsyncHttpResponseHandler() {
+
+		    @Override
+		    public void onStart() {
+		        // called before request is started
+		    }
+
+		    @Override
+		    public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+		        // called when response HTTP status is "200 OK"
+		    }
+
+		    @Override
+		    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+		        // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+		    }
+
+		    @Override
+		    public void onRetry(int retryNo) {
+		        // called when request is retried
+			}
+		});
+
+		public class TwitterRestClient {
+			private static final String BASE_URL = "http://api.twitter.com/1/";
+
+			private static AsyncHttpClient client = new AsyncHttpClient();
+
+			public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+			      client.get(getAbsoluteUrl(url), params, responseHandler);
+			}
+
+			public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+			      client.post(getAbsoluteUrl(url), params, responseHandler);
+			}
+
+			private static String getAbsoluteUrl(String relativeUrl) {
+			      return BASE_URL + relativeUrl;
+			}
+		}
+
+		class TwitterRestClientUsage {
+		    public void getPublicTimeline() throws JSONException {
+		        TwitterRestClient.get("statuses/public_timeline.json", null, new JsonHttpResponseHandler() {
+		            @Override
+		            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+		                // If the response is JSONObject instead of expected JSONArray
+		            }
+		            
+		            @Override
+		            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+		                // Pull out the first event on the public timeline
+		                JSONObject firstEvent = timeline.get(0);
+		                String tweetText = firstEvent.getString("text");
+
+		                // Do something with the response
+		                System.out.println(tweetText);
+		            }
+		        });
+		    }
+		}
+
+------------------------------------------------------------------------------------------------------------------
+
+#EventBus
+
+	1.gradle
+
+		dependencies {
+			compile 'de.greenrobot:eventbus:2.4.0'
+		}
+
+	2.sample
+
+		//发送消息
+		eventBus.post(event);
+
+		//接收前先注册
+		eventBus.register(this);
+
+		//执行在发送线程中
+		public void onEvent(AnyEventType event) {
+			/* Do something */
+		};
+
+		//后台线程
+		public void onEventBackground(AnyEventType event) {
+			/* Do something */
+		};
+
+		//UI线程
+		public void onEventMainThread(AnyEventType event) {
+			/* Do something */
+		};
+
+------------------------------------------------------------------------------------------------------------------
+
+#Fresco
+	1.gradle
+
+		dependencies {
+			compile 'com.facebook.fresco:fresco:0.5.0+'
+		}
+
+	2.sample
+
+		//Application中初始化
+		Fresco.initialize(context);
+
+		<!-- xml文件中加入命名空间 -->
+		<LinearLayout 
+		    xmlns:android="http://schemas.android.com/apk/res/android"
+	  		xmlns:fresco="http://schemas.android.com/apk/res-auto">
+
+	  	<!-- 所有ImageView用此控件替换 -->
+	  	<com.facebook.drawee.view.SimpleDraweeView
+		    android:id="@+id/my_image_view"
+		    android:layout_width="20dp"
+		    android:layout_height="20dp"
+		    fresco:placeholderImage="@drawable/my_drawable"
+			/>
+
+		//Uri方式打开图片
+		Uri uri = Uri.parse("https://raw.githubusercontent.com/liaohuqiu/fresco-docs-cn/docs/static/fresco-logo.png");
+		draweeView.setImageURI(uri);
+
+		//Uri支持类型
+		远程图片	http://, https://	HttpURLConnection 或者参考 使用其他网络加载方案
+		本地文件	file://	FileInputStream
+		Content provider	content://	ContentResolver
+		asset目录下的资源	asset://	AssetManager
+		res目录下的资源	res://	Resources.openRawResource
+
+------------------------------------------------------------------------------------------------------------------
+
+#Nfc
+	
+	1.sample
+
+		<!-- AndroidMainfest.xml中过滤action -->
+		<activity
+	        android:name="com.zhh.demo11.nfc.NfcActivity_"
+	        android:alwaysRetainTaskState="true"
+	        android:label="@string/app_name"
+	        android:launchMode="singleInstance"
+	        android:screenOrientation="nosensor" >
+	        <intent-filter>
+	            <action android:name="android.nfc.action.TAG_DISCOVERED" />
+	            <category android:name="android.intent.category.DEFAULT" />
+	        </intent-filter>
+	    </activity>
+
+	    void initNfc() {
+	        mNfc = Nfc.getInstance(this);
+	        mNfc.PushText("test push text", null);
+	    }
+
+	    @Override
+	    protected void onResume() {
+	        super.onResume();
+	        mNfc.onResume(null);
+	    }
+
+	    @Override
+	    protected void onPause() {
+	        super.onPause();
+	        mNfc.onPause();
+	    }
+
+	    //onNewIntent中处理收到的action并解析
+	    @Override
+    	protected void onNewIntent(Intent intent) {
+        	super.onNewIntent(intent);
+        	//TODO 见NfcActivity
+        }

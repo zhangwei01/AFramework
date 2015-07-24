@@ -1,0 +1,32 @@
+
+common
+	CommonUtil		常用工具类
+	ContactUtil		获取联系人、短信相关
+	DateUtil		时间工具类
+	TimeUtil		时间工具类
+	MathUtil		数学计算工具类
+	NetUtil			网络请求工具类
+	SdcardUtil		sd卡相关工具类
+	ShareUtil		分享工具类
+	TextUtil		文字正则表达式判断
+database
+	DatabaseUtil	数据库工具类
+device
+	DensityUtil		屏幕尺寸适配dp2px
+	DeviceInfoUtil	设备信息
+file
+	FileSizeUtil	文件大小转换
+	FileUtil11		文件基本操作
+	FileUtil		文件复杂操作
+log
+	LogUtil			日志工具类（统一用此方法调试）
+	SaveDebugLogUtil 保存日志信息到本地
+pref
+	SettingPrefs	SharedPreferences封装工具类
+res
+	ResourceUtil	资源获取工具类
+thread
+	MultiThreadExecutor	线程池管理工具类
+	TimeTickUtil	定时器工具类
+	
+	
